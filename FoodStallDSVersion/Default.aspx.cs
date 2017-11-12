@@ -6,21 +6,53 @@ using System.Web.UI;
 using System.Web.UI.WebControls;
 using System.Data.Sql;
 using System.Data.SqlClient;
+using FoodStallDSVersion.DataSet1TableAdapters;
 
 namespace FoodStallDSVersion
 {
     public partial class Default : System.Web.UI.Page
     {
-        DataSet1 ds;
+        DataSet1 ds = new DataSet1();
         protected void Page_Load(object sender, EventArgs e)
         {
-            string cnS = "Server=tcp:changsiangsqlserver.database.windows.net,1433;Initial Catalog=changsiangfooddb;Persist Security Info=False;User ID={your_username};Password={your_password};MultipleActiveResultSets=False;Encrypt=True;TrustServerCertificate=False;Connection Timeout=30;";
-            SqlConnection cn = new SqlConnection(cnS);
-            SqlCommand cm = new SqlCommand("Select * from Users", cn);
-            SqlDataAdapter da = new SqlDataAdapter(cm);
-            ds = new DataSet1();
-            da.Fill(ds, "Users");
+
             
         }
+        protected void BtnLogin_Click(object sender, EventArgs e)
+        {
+            Login();
+        }
+        protected void BtnReg_Click(object sender, EventArgs e)
+        {
+            Server.Transfer("RegNewUser.aspx", true);
+        }
+
+        protected void ButtonSummary_Click(object sender, EventArgs e)
+        {
+            Server.Transfer("OrderSummary.aspx", true);
+        }
+
+        protected void Login()
+        {
+            UsersTableAdapter ta = new UsersTableAdapter();
+            DataSet1.UsersDataTable userDataTable = new DataSet1.UsersDataTable();
+            ta.Fill(userDataTable);
+            string passWord = (userDataTable.AsEnumerable().Where(x => x.userName == TextBoxUser.Text).Select(x => x.password.ToString()).First());
+            try
+            {             
+                if(TextBoxPw.Text == passWord)
+                {
+                    Session["UserName"] = TextBoxUser.Text;
+                    Session["PersonName"] = (userDataTable.AsEnumerable().Where(x => x.userName == TextBoxUser.Text).Select(x => x.personName.ToString()).First());
+                    Response.Redirect("OrderPage.aspx", true);
+                }
+            }
+            catch (Exception ex)
+            {
+                LabelAlert.Text = string.Format("Invalid Login Username/Password. Please try again! \n {0}", ex.ToString());
+            }
+        }
+
+
     }
 }
