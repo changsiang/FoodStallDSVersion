@@ -40,10 +40,11 @@ namespace FoodStallDSVersion
             DataSet1.Food_DishesDataTable foodDishes = new DataSet1.Food_DishesDataTable();
             DataSet1.SizesDataTable sizes = new DataSet1.SizesDataTable();
             ta.Fill(foodDishes);
+            sizeta.Fill(sizes);
             decimal? foodPrice = foodDishes.AsEnumerable().Where(x => x.dishName == DdlFoodChoice.SelectedValue).Select(x => x.price).First();
             decimal? sizePrice = sizes.AsEnumerable().Where(x => x.sizeOption == DddlSizeOption.SelectedValue).Select(x => x.price).First();
             double price = Convert.ToDouble(foodPrice + sizePrice);
-            LabelPrice.Text = string.Format("${0;.##}", price);
+            LabelPrice.Text = string.Format("${0:.##}", price);
         }
 
         protected void SubmitOrder()
@@ -62,20 +63,19 @@ namespace FoodStallDSVersion
                         spiceOption += " " + o.Value.ToString();
                 }
                 OrdersTableAdapter orderta = new OrdersTableAdapter();
-                DataSet1.OrdersDataTable orderdt = new DataSet1.OrdersDataTable();
-                orderta.Fill(orderdt);
+                orderta.Fill(ds.Orders);
                 try
                 {
-                    DataRow dr = orderdt.NewRow();
+                    DataRow dr = ds.Orders.NewRow();
                     dr["orderUser"] = userName;
                     dr["orderDate"] = DateTime.Now;
                     dr["orderDish"] = DdlFoodChoice.SelectedItem.ToString();
                     dr["orderSize"] = DddlSizeOption.SelectedItem.ToString();
                     dr["orderSpices"] = spiceOption;
-                    dr["deliveryLocation"] = txtBoxStreetName.Text + " " + TxtBoxUnit.Text + "Postal Code " + TxtBoxPostal.Text;
+                    dr["deliveryLocation"] = txtBoxStreetName.Text + " " + TxtBoxUnit.Text + " Postal Code " + TxtBoxPostal.Text;
                     dr["orderStatus"] = "Pending";
                     ds.Tables["Orders"].Rows.Add(dr);
-                    orderta.Update(orderdt);
+                    orderta.Update(ds.Orders);
                     LabelStatus.Text = "Order Submitted Successfully";
                     ClearForm();
                 }

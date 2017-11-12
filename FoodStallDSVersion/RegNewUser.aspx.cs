@@ -30,8 +30,8 @@ namespace FoodStallDSVersion
                 }
                 catch (Exception ex)
                 {
-                    if (ex is DBConcurrencyException)
-                        LabelError.Text = string.Format("Username already taken.\n Please choose a different Username.");
+                    if (ex is ArgumentException)
+                        LabelError.Text = string.Format("Username already taken.\n Please choose a different Username. {0}", ex.ToString());
                     else
                         LabelError.Text = string.Format("General Error!!\n {0}", ex.ToString());
 
@@ -47,15 +47,14 @@ namespace FoodStallDSVersion
         protected void CreateNewUser()
         {
             UsersTableAdapter ta = new UsersTableAdapter();
-            DataSet1.UsersDataTable users = new DataSet1.UsersDataTable();
-            ta.Fill(users);
-            DataRow dr = users.NewRow();
+            ta.Fill(ds.Users);
+            DataRow dr = ds.Users.NewRow();
             dr["userName"] = TextBoxUsername.Text;
             dr["password"] = TextBoxPw.Text;
             dr["personName"] = TextBoxName.Text;
-            dr["Address"] = TextBoxAddress.Text;
+            dr["personAddress"] = TextBoxAddress.Text;
             ds.Tables["Users"].Rows.Add(dr);
-            ta.Update(users);
+            ta.Update(ds.Users);
             LabelError.Text = "Account Created Successfully";
             Response.Redirect("Default.aspx");
         }

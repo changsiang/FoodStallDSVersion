@@ -20,7 +20,14 @@ namespace FoodStallDSVersion
         }
         protected void BtnLogin_Click(object sender, EventArgs e)
         {
-            Login();
+            try
+            {
+                Login();
+            }
+            catch (Exception ex)
+            {
+                LabelAlert.Text = string.Format("Invalid Login Username/Password. Please try again! {0} {1}", Environment.NewLine, ex.ToString());
+            }
         }
         protected void BtnReg_Click(object sender, EventArgs e)
         {
@@ -38,8 +45,7 @@ namespace FoodStallDSVersion
             DataSet1.UsersDataTable userDataTable = new DataSet1.UsersDataTable();
             ta.Fill(userDataTable);
             string passWord = (userDataTable.AsEnumerable().Where(x => x.userName == TextBoxUser.Text).Select(x => x.password.ToString()).First());
-            try
-            {             
+            
                 if(TextBoxPw.Text == passWord)
                 {
                     Session["UserName"] = TextBoxUser.Text;
@@ -47,12 +53,6 @@ namespace FoodStallDSVersion
                     Response.Redirect("OrderPage.aspx", true);
                 }
             }
-            catch (Exception ex)
-            {
-                LabelAlert.Text = string.Format("Invalid Login Username/Password. Please try again! \n {0}", ex.ToString());
-            }
+
         }
-
-
     }
-}
